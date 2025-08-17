@@ -4,252 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ナレッジ共有 - 会議資料管理システム</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-            font-weight: 300;
-        }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1rem;
-        }
-
-        .nav-links {
-            padding: 20px 30px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .nav-links a {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #3498db;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .nav-links a:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-        }
-
-        .nav-links a.primary {
-            background: #e74c3c;
-        }
-
-        .nav-links a.primary:hover {
-            background: #c0392b;
-        }
-
-        .content {
-            padding: 40px;
-        }
-
-        .search-box {
-            margin-bottom: 30px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e1e8ed;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-        }
-
-        .articles-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 25px;
-            margin-top: 20px;
-        }
-
-        .article-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            padding: 25px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: 1px solid #f0f0f0;
-        }
-
-        .article-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-
-        .article-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 12px;
-            line-height: 1.4;
-        }
-
-        .article-content {
-            color: #7f8c8d;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 15px;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .article-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.85rem;
-            color: #95a5a6;
-            border-top: 1px solid #ecf0f1;
-            padding-top: 15px;
-        }
-
-        .article-author {
-            font-weight: 500;
-            color: #3498db;
-        }
-
-        .article-date {
-            font-style: italic;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #7f8c8d;
-        }
-
-        .loading-spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .no-articles {
-            text-align: center;
-            padding: 60px 20px;
-            color: #7f8c8d;
-        }
-
-        .no-articles h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: #95a5a6;
-        }
-
-        .no-articles p {
-            font-size: 1.1rem;
-            margin-bottom: 20px;
-        }
-
-        .no-articles a {
-            color: #3498db;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .no-articles a:hover {
-            text-decoration: underline;
-        }
-
-        .message {
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .article-count {
-            margin-bottom: 20px;
-            color: #7f8c8d;
-            font-size: 0.9rem;
-        }
-
-        @media (max-width: 768px) {
-            .articles-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .nav-links {
-                flex-direction: column;
-            }
-            
-            .article-meta {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-gradient-to-br from-indigo-500 to-purple-500 min-h-screen p-4 sm:p-6 lg:p-8 font-sans">
     <script>
         // ナビゲーションバーの動的な変更
         document.addEventListener('DOMContentLoaded', async () => {
@@ -262,22 +19,22 @@
                     if (authStatus.authenticated) {
                         // ログイン済みの場合
                         navLinks.innerHTML = `
-                            <a href="/">資料アップロード</a>
-                            <a href="/documents">資料一覧</a>
-                            <a href="/knowledge">ナレッジ共有</a>
-                            <div style="flex-grow: 1;"></div>
-                            <a href="/knowledge/new" class="primary">新しい記事を作成</a>
-                            <div style="color: white; padding: 10px 0; font-weight: 500;">
+                            <a href="/" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">資料アップロード</a>
+                            <a href="/documents" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">資料一覧</a>
+                            <a href="/knowledge" class="py-2 px-4 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-colors duration-200">ナレッジ共有</a>
+                            <div class="flex-grow"></div>
+                            <a href="/knowledge/new" class="py-2 px-4 rounded-lg bg-green-500 hover:bg-green-600 text-white font-semibold transition-colors duration-200">新しい記事を作成</a>
+                            <div class="text-white font-semibold flex items-center px-4">
                                 ${authStatus.username}としてログイン中
                             </div>
-                            <a href="#" onclick="logout()" style="background: #e74c3c; margin-left: 10px;">ログアウト</a>
+                            <a href="#" onclick="logout()" class="py-2 px-4 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold transition-colors duration-200">ログアウト</a>
                         `;
                     } else {
                         // 未ログインの場合
                         navLinks.innerHTML = `
-                            <div style="flex-grow: 1;"></div>
-                            <a href="/login">ログイン</a>
-                            <a href="/register" style="background: #27ae60;">新規登録</a>
+                            <div class="flex-grow"></div>
+                            <a href="/login" class="py-2 px-4 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-colors duration-200">ログイン</a>
+                            <a href="/register" class="py-2 px-4 rounded-lg bg-green-500 hover:bg-green-600 text-white font-semibold transition-colors duration-200">新規登録</a>
                         `;
                     }
                 } catch (error) {
@@ -297,55 +54,45 @@
             }
         }
     </script>
-    <div class="container">
-        <div class="header">
-            <h1>ナレッジ共有</h1>
-            <p>チームの知識とノウハウを共有しましょう</p>
-        </div>
+    <div class="container max-w-6xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+        <header class="bg-gray-800 text-white p-6 sm:p-8 text-center">
+            <h1 class="text-3xl sm:text-4xl font-light mb-2">ナレッジ共有</h1>
+            <p class="text-gray-300 text-lg">チームの知識とノウハウを共有しましょう</p>
+        </header>
 
-        <div class="nav-links">
-            <a href="/">資料アップロード</a>
-            <a href="/documents">資料一覧</a>
-            <a href="/knowledge/new" class="primary">新しい記事を作成</a>
-            <a href="#" onclick="loadArticles()">更新</a>
-        </div>
+        <nav class="nav-links flex flex-wrap items-center gap-2 p-4 border-b border-gray-200 bg-gray-800 text-white sm:text-base text-sm"></nav>
 
-        <div class="content">
-            <div class="message" id="message"></div>
+        <main class="p-6 sm:p-8">
+            <div id="message" class="hidden p-4 rounded-lg mb-4"></div>
 
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="記事のタイトルまたは作成者で検索...">
+            <div class="search-box mb-6">
+                <input type="text" id="searchInput" placeholder="記事のタイトルまたは作成者で検索..." class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow duration-200">
             </div>
 
-            <div class="article-count" id="articleCount"></div>
-
-            <div id="loading" class="loading">
-                <div class="loading-spinner"></div>
+            <div id="loading" class="text-center p-8 text-gray-600">
+                <div class="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mx-auto mb-2"></div>
                 <div>読み込み中...</div>
             </div>
 
             <div id="articlesContainer">
-                <div class="articles-grid" id="articlesGrid" style="display: none;">
+                <div id="articlesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
                 </div>
 
-                <div class="no-articles" id="noArticles" style="display: none;">
-                    <h3>📝 まだ記事がありません</h3>
-                    <p>最初の記事を作成して、チームの知識共有を始めましょう。</p>
-                    <p><a href="/knowledge/new">新しい記事を作成する</a></p>
+                <div id="noArticles" class="text-center p-12 text-gray-500 hidden">
+                    <h3 class="text-2xl font-semibold text-gray-400 mb-4">📝 まだ記事がありません</h3>
+                    <p class="text-lg text-gray-500 mb-4">最初の記事を作成して、チームの知識共有を始めましょう。</p>
+                    <a href="/knowledge/new" class="py-2 px-4 rounded-lg bg-green-500 hover:bg-green-600 text-white font-semibold transition-colors duration-200">新しい記事を作成する</a>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <script>
         let allArticles = [];
         let filteredArticles = [];
 
-        // ページ読み込み時に記事一覧を取得
         document.addEventListener('DOMContentLoaded', () => {
             loadArticles();
-            
-            // 検索機能
             const searchInput = document.getElementById('searchInput');
             searchInput.addEventListener('input', filterArticles);
         });
@@ -355,9 +102,9 @@
             const articlesGrid = document.getElementById('articlesGrid');
             const noArticles = document.getElementById('noArticles');
             
-            loading.style.display = 'block';
-            articlesGrid.style.display = 'none';
-            noArticles.style.display = 'none';
+            loading.classList.remove('hidden');
+            articlesGrid.classList.add('hidden');
+            noArticles.classList.add('hidden');
             
             try {
                 const response = await fetch('/api/articles');
@@ -367,18 +114,17 @@
                 filteredArticles = articles;
                 
                 if (articles.length === 0) {
-                    noArticles.style.display = 'block';
+                    noArticles.classList.remove('hidden');
                 } else {
                     displayArticles(articles);
-                    articlesGrid.style.display = 'grid';
+                    articlesGrid.classList.remove('hidden');
                 }
                 
-                updateArticleCount(articles.length);
             } catch (error) {
                 showMessage('記事の読み込みに失敗しました', 'error');
             }
             
-            loading.style.display = 'none';
+            loading.classList.add('hidden');
         }
 
         function displayArticles(articles) {
@@ -387,15 +133,15 @@
             
             articles.forEach(article => {
                 const card = document.createElement('div');
-                card.className = 'article-card';
+                card.className = 'bg-white rounded-xl shadow-lg hover:shadow-2xl p-6 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer';
                 card.onclick = () => window.location.href = `/knowledge/${article.id}`;
                 
                 card.innerHTML = `
-                    <div class="article-title">${escapeHtml(article.title)}</div>
-                    <div class="article-content">${escapeHtml(article.content)}</div>
-                    <div class="article-meta">
-                        <div class="article-author">by ${escapeHtml(article.author)}</div>
-                        <div class="article-date">${formatDate(article.created_at)}</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">${escapeHtml(article.title)}</h3>
+                    <p class="text-gray-600 text-sm line-clamp-3 mb-4">${escapeHtml(article.content)}</p>
+                    <div class="flex items-center justify-between text-xs text-gray-500 border-t pt-4 mt-4">
+                        <span class="font-medium text-blue-600">by ${escapeHtml(article.author)}</span>
+                        <span>${formatDate(article.created_at)}</span>
                     </div>
                 `;
                 
@@ -417,16 +163,6 @@
             }
             
             displayArticles(filteredArticles);
-            updateArticleCount(filteredArticles.length);
-        }
-
-        function updateArticleCount(count) {
-            const articleCount = document.getElementById('articleCount');
-            if (count === 0) {
-                articleCount.textContent = '';
-            } else {
-                articleCount.textContent = `${count}件の記事が見つかりました`;
-            }
         }
 
         function formatDate(dateString) {
@@ -447,11 +183,15 @@
         function showMessage(text, type) {
             const message = document.getElementById('message');
             message.textContent = text;
-            message.className = `message ${type}`;
-            message.style.display = 'block';
+            if (type === 'success') {
+                message.className = 'bg-green-100 text-green-700 p-4 rounded-lg mb-4';
+            } else if (type === 'error') {
+                message.className = 'bg-red-100 text-red-700 p-4 rounded-lg mb-4';
+            }
+            message.classList.remove('hidden');
             
             setTimeout(() => {
-                message.style.display = 'none';
+                message.classList.add('hidden');
             }, 5000);
         }
     </script>

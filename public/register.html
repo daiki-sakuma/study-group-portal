@@ -4,124 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>新規登録 - 会議資料管理システム</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            gap: 20px;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .container {
-            max-width: 400px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            padding: 40px;
-            text-align: center;            
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: auto;
-        }
-
-        .container h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #555;
-            margin-top: 10px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e1e8ed;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
-        }
-
-        .message {
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .login-link {
-            margin-top: 20px;
-            font-size: 0.9rem;
-            color: #555;
-            text-align: center;
-        }
-
-        .login-link a {
-            color: #3498db;
-            text-decoration: none;
-            font-weight: 500;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <div class="container">
-        <h1>新規登録</h1>
-        <div class="message" id="message"></div>
-        <form id="registerForm">
-            <div class="form-group">
-                <label for="username">ユーザー名</label>
-                <input type="text" id="username" name="username" required>
+<body class="bg-gradient-to-br from-indigo-500 to-purple-500 min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full bg-white rounded-xl shadow-2xl p-8 flex flex-col items-center">
+        <h1 class="text-4xl font-light mb-8 text-gray-800">新規登録</h1>
+        <div class="mb-4 hidden" id="message"></div>
+        <form id="registerForm" class="w-full">
+            <div class="mb-6">
+                <label for="username" class="block text-gray-700 font-semibold mb-2 text-left">ユーザー名</label>
+                <input type="text" id="username" name="username" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition-colors duration-200" placeholder="ユーザー名を入力してください">
             </div>
-            <div class="form-group">
-                <label for="password">パスワード</label>
-                <input type="password" id="password" name="password" required>
+            <div class="mb-6">
+                <label for="password" class="block text-gray-700 font-semibold mb-2 text-left">パスワード</label>
+                <input type="password" id="password" name="password" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition-colors duration-200" placeholder="パスワードを入力してください">
             </div>
-            <button type="submit" class="submit-btn">登録</button>
+            <button type="submit" class="w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-300 focus:outline-none">登録</button>
         </form>
-        <div class="login-link">
-            アカウントをお持ちですか？ <a href="/login">こちらからログイン</a>
+        <div class="mt-6 text-sm text-gray-600">
+            アカウントをお持ちですか？ <a href="/login" class="text-blue-600 font-bold hover:underline transition-colors duration-200">こちらからログイン</a>
         </div>
     </div>
     <script>
@@ -140,21 +41,18 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    messageDiv.className = 'message success';
+                    messageDiv.className = 'bg-green-100 text-green-700 p-3 rounded-lg mb-4 block';
                     messageDiv.textContent = result.message;
-                    messageDiv.style.display = 'block';
                     setTimeout(() => {
                         window.location.href = '/login';
                     }, 2000);
                 } else {
-                    messageDiv.className = 'message error';
+                    messageDiv.className = 'bg-red-100 text-red-700 p-3 rounded-lg mb-4 block';
                     messageDiv.textContent = result.error;
-                    messageDiv.style.display = 'block';
                 }
             } catch (err) {
-                messageDiv.className = 'message error';
+                messageDiv.className = 'bg-red-100 text-red-700 p-3 rounded-lg mb-4 block';
                 messageDiv.textContent = 'ネットワークエラーが発生しました。';
-                messageDiv.style.display = 'block';
             }
         });
     </script>
