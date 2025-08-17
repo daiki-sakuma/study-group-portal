@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新しい記事を作成 - 会議資料管理システム</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .nav-links {
+            padding: 20px 30px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            margin-right: 10px;
+        }
+
+        .nav-links a:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 300px;
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.3);
+        }
+
+        .submit-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .form-tips {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-tips h3 {
+            color: #495057;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .form-tips ul {
+            color: #6c757d;
+            padding-left: 20px;
+        }
+
+        .form-tips li {
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>新しい記事を作成</h1>
+            <p>チームの知識とノウハウを共有しましょう</p>
+        </div>
+
+        <div class="nav-links">
+            <a href="/knowledge">記事一覧に戻る</a>
+            <a href="/">資料アップロード</a>
+            <a href="/documents">資料一覧</a>
+        </div>
+
+        <div class="form-container">
+            <div class="message" id="message"></div>
+
+            <div class="form-tips">
+                <h3>📝 記事作成のコツ</h3>
+                <ul>
+                    <li>分かりやすいタイトルを付けましょう</li>
+                    <li>具体的な手順や例を含めると理解しやすくなります</li>
+                    <li>改行を使って読みやすく整理しましょう</li>
+                    <li>他のメンバーが検索しやすいキーワードを含めましょう</li>
+                </ul>
+            </div>
+
+            <form id="articleForm">
+                <div class="form-group">
+                    <label for="title">記事タイトル *</label>
+                    <input type="text" id="title" name="title" required placeholder="例：新しいプロジェクトの進め方について">
+                </div>
+
+                <div class="form-group">
+                    <label for="author">作成者 *</label>
+                    <input type="text" id="author" name="author" required placeholder="例：田中太郎">
+                </div>
+
+                <div class="form-group">
+                    <label for="content">記事内容 *</label>
+                    <textarea id="content" name="content" required placeholder="記事の内容を詳しく書いてください。
+
+例：
+1. 概要
+プロジェクトを開始する際の基本的な流れについて説明します。
+
+2. 準備段階
+- 要件の整理
+- チームメンバーの確認
+- スケジュールの作成
+
+3. 実行段階
+..."></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    記事を作成
+                </button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <div>記事を作成中...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const articleForm = document.getElementById('articleForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const message = document.getElementById('message');
+
+        // フォーム送信処理
+        articleForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(articleForm);
+            const articleData = {
+                title: formData.get('title'),
+                content: formData.get('content'),
+                author: formData.get('author')
+            };
+            
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+            message.style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/articles', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(articleData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showMessage(result.message, 'success');
+                    setTimeout(() => {
+                        window.location.href = '/knowledge';
+                    }, 2000);
+                } else {
+                    showMessage(result.error || '記事の作成に失敗しました', 'error');
+                }
+            } catch (error) {
+                showMessage('ネットワークエラーが発生しました', 'error');
+            }
+            
+            submitBtn.disabled = false;
+            loading.style.display = 'none';
+        });
+
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = `message ${type}`;
+            message.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    message.style.display = 'none';
+                }, 3000);
+            } else {
+                setTimeout(() => {
+                    message.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // 文字数カウント機能（オプション）
+        const contentTextarea = document.getElementById('content');
+        contentTextarea.addEventListener('input', () => {
+            const length = contentTextarea.value.length;
+            if (length > 5000) {
+                contentTextarea.style.borderColor = '#e74c3c';
+            } else {
+                contentTextarea.style.borderColor = '#e1e8ed';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>記事詳細 - 会議資料管理システム</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .nav-links {
+            padding: 20px 30px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            margin-right: 10px;
+        }
+
+        .nav-links a:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .article-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .article-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .article-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #7f8c8d;
+            font-size: 0.95rem;
+        }
+
+        .article-author {
+            font-weight: 500;
+            color: #3498db;
+        }
+
+        .article-date {
+            font-style: italic;
+        }
+
+        .article-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #2c3e50;
+            margin-bottom: 40px;
+            white-space: pre-wrap;
+        }
+
+        .comments-section {
+            border-top: 2px solid #ecf0f1;
+            padding-top: 30px;
+        }
+
+        .comments-header {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .comment-form {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.5;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .submit-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .submit-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .comments-list {
+            space-y: 20px;
+        }
+
+        .comment {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .comment:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .comment-author {
+            font-weight: 500;
+            color: #3498db;
+        }
+
+        .comment-date {
+            font-size: 0.85rem;
+            color: #95a5a6;
+            font-style: italic;
+        }
+
+        .comment-content {
+            color: #2c3e50;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .no-comments {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .article-title {
+                font-size: 1.6rem;
+            }
+            
+            .article-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .comment-form {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>記事詳細</h1>
+        </div>
+
+        <div class="nav-links">
+            <a href="/knowledge">記事一覧に戻る</a>
+            <a href="/">資料アップロード</a>
+            <a href="/documents">資料一覧</a>
+        </div>
+
+        <div class="content">
+            <div class="message" id="message"></div>
+
+            <div id="loading" class="loading">
+                <div class="loading-spinner"></div>
+                <div>読み込み中...</div>
+            </div>
+
+            <div id="articleContainer" style="display: none;">
+                <div class="article-header">
+                    <h1 class="article-title" id="articleTitle"></h1>
+                    <div class="article-meta">
+                        <div class="article-author" id="articleAuthor"></div>
+                        <div class="article-date" id="articleDate"></div>
+                    </div>
+                </div>
+
+                <div class="article-content" id="articleContent"></div>
+
+                <div class="comments-section">
+                    <div class="comments-header">
+                        💬 コメント <span id="commentCount">(0)</span>
+                    </div>
+
+                    <div class="comment-form">
+                        <form id="commentForm">
+                            <div class="form-group">
+                                <label for="commentAuthor">お名前 *</label>
+                                <input type="text" id="commentAuthor" name="author" required placeholder="例：田中太郎">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="commentContent">コメント *</label>
+                                <textarea id="commentContent" name="content" required placeholder="この記事についてのコメントや質問をお書きください..."></textarea>
+                            </div>
+
+                            <button type="submit" class="submit-btn" id="submitBtn">
+                                コメントを投稿
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="comments-list" id="commentsList">
+                        <div class="no-comments" id="noComments">
+                            まだコメントがありません。最初のコメントを投稿してみましょう。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let articleId = null;
+
+        // ページ読み込み時に記事詳細を取得
+        document.addEventListener('DOMContentLoaded', () => {
+            // URLから記事IDを取得
+            const pathParts = window.location.pathname.split('/');
+            articleId = pathParts[pathParts.length - 1];
+            
+            if (articleId) {
+                loadArticle();
+                loadComments();
+            }
+
+            // コメントフォーム送信処理
+            const commentForm = document.getElementById('commentForm');
+            commentForm.addEventListener('submit', submitComment);
+        });
+
+        async function loadArticle() {
+            const loading = document.getElementById('loading');
+            const articleContainer = document.getElementById('articleContainer');
+            
+            loading.style.display = 'block';
+            articleContainer.style.display = 'none';
+            
+            try {
+                const response = await fetch(`/api/articles/${articleId}`);
+                
+                if (!response.ok) {
+                    throw new Error('記事が見つかりません');
+                }
+                
+                const article = await response.json();
+                
+                document.getElementById('articleTitle').textContent = article.title;
+                document.getElementById('articleAuthor').textContent = `by ${article.author}`;
+                document.getElementById('articleDate').textContent = formatDate(article.created_at);
+                document.getElementById('articleContent').textContent = article.content;
+                
+                // ページタイトルを更新
+                document.title = `${article.title} - 会議資料管理システム`;
+                
+                articleContainer.style.display = 'block';
+            } catch (error) {
+                showMessage('記事の読み込みに失敗しました', 'error');
+            }
+            
+            loading.style.display = 'none';
+        }
+
+        async function loadComments() {
+            try {
+                const response = await fetch(`/api/articles/${articleId}/comments`);
+                const comments = await response.json();
+                
+                displayComments(comments);
+                updateCommentCount(comments.length);
+            } catch (error) {
+                console.error('コメントの読み込みに失敗しました:', error);
+            }
+        }
+
+        function displayComments(comments) {
+            const commentsList = document.getElementById('commentsList');
+            const noComments = document.getElementById('noComments');
+            
+            if (comments.length === 0) {
+                noComments.style.display = 'block';
+                return;
+            }
+            
+            noComments.style.display = 'none';
+            
+            commentsList.innerHTML = '';
+            
+            comments.forEach(comment => {
+                const commentDiv = document.createElement('div');
+                commentDiv.className = 'comment';
+                
+                commentDiv.innerHTML = `
+                    <div class="comment-header">
+                        <div class="comment-author">${escapeHtml(comment.author)}</div>
+                        <div class="comment-date">${formatDate(comment.created_at)}</div>
+                    </div>
+                    <div class="comment-content">${escapeHtml(comment.content)}</div>
+                `;
+                
+                commentsList.appendChild(commentDiv);
+            });
+        }
+
+        function updateCommentCount(count) {
+            const commentCount = document.getElementById('commentCount');
+            commentCount.textContent = `(${count})`;
+        }
+
+        async function submitComment(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const commentData = {
+                content: formData.get('content'),
+                author: formData.get('author')
+            };
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '投稿中...';
+            
+            try {
+                const response = await fetch(`/api/articles/${articleId}/comments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(commentData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showMessage(result.message, 'success');
+                    document.getElementById('commentForm').reset();
+                    loadComments(); // コメント一覧を再読み込み
+                } else {
+                    showMessage(result.error || 'コメントの投稿に失敗しました', 'error');
+                }
+            } catch (error) {
+                showMessage('ネットワークエラーが発生しました', 'error');
+            }
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'コメントを投稿';
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            
+            return `${year}/${month}/${day} ${hours}:${minutes}`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showMessage(text, type) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.className = `message ${type}`;
+            message.style.display = 'block';
+            
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
