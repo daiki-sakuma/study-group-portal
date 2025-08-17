@@ -192,7 +192,7 @@ app.use(express.static('public'));
 
 // ルート - 新しいトップページ（認証保護）
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'top.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // 資料一覧ページ（認証保護）

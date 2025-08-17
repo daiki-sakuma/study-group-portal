@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>勉強会ポータルサイト</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white font-sans">
+    <script>
+        // ナビゲーションバーの動的な変更
+        document.addEventListener('DOMContentLoaded', async () => {
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks) {
+                try {
+                    const response = await fetch('/api/auth_status');
+                    const authStatus = await response.json();
+
+                    const baseLinks = `
+                        <a href="/" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">ホーム</a>
+                        <a href="/upload" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">資料アップロード</a>
+                        <a href="/documents" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">資料一覧</a>
+                        <a href="/knowledge" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">ナレッジ共有</a>
+                    `;
+
+                    if (authStatus.authenticated) {
+                        // ログイン済みの場合
+                        navLinks.innerHTML = `
+                            ${baseLinks}
+                            <div class="flex-grow"></div>
+                            <div class="text-white font-semibold flex items-center px-4">
+                                ${authStatus.username}としてログイン中
+                            </div>
+                            <a href="#" onclick="logout()" class="py-2 px-4 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold transition-colors duration-200">ログアウト</a>
+                        `;
+                    } else {
+                        // 未ログインの場合
+                        navLinks.innerHTML = `
+                            ${baseLinks}
+                            <div class="flex-grow"></div>
+                            <a href="/login" class="py-2 px-4 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-colors duration-200">ログイン</a>
+                            <a href="/register" class="py-2 px-4 rounded-lg bg-green-500 hover:bg-green-600 text-white font-semibold transition-colors duration-200">新規登録</a>
+                        `;
+                    }
+                    
+                    const currentPath = window.location.pathname;
+                    navLinks.querySelectorAll('a').forEach(link => {
+                        if (link.getAttribute('href') === currentPath) {
+                            link.classList.add('bg-blue-500', 'hover:bg-blue-600');
+                        } else if (currentPath === '/' && link.getAttribute('href') === '/') {
+                            link.classList.add('bg-blue-500', 'hover:bg-blue-600');
+                        }
+                    });
+
+                } catch (error) {
+                    console.error('認証状態の取得に失敗しました:', error);
+                }
+            }
+        });
+
+        async function logout() {
+            if (confirm('ログアウトしますか？')) {
+                try {
+                    await fetch('/api/logout', { method: 'POST' });
+                    window.location.href = '/login';
+                } catch (error) {
+                    alert('ログアウトに失敗しました');
+                }
+            }
+        }
+    </script>
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <header class="bg-gray-800 text-white p-6 sm:p-8 text-center rounded-b-xl shadow-lg">
+            <h1 class="text-3xl sm:text-4xl font-light mb-2">勉強会ポータルサイトへようこそ！</h1>
+            <p class="text-gray-400 text-lg">AI・機械学習を学ぶコミュニティ</p>
+        </header>
+
+        <nav class="nav-links flex flex-wrap items-center gap-2 p-4 bg-gray-800 text-white sm:text-base text-sm rounded-xl shadow-lg mt-4"></nav>
+
+        <main class="py-12">
+            <section class="mb-12">
+                <div class="bg-gray-800 p-8 rounded-xl shadow-xl border-l-4 border-blue-500">
+                    <h2 class="text-3xl font-bold mb-4 text-gray-200">このサイトについて</h2>
+                    <p class="text-gray-400 leading-relaxed">
+                        このポータルサイトは、AI技術や機械学習に関する知識を共有し、メンバー同士が交流を深めるためのプラットフォームです。
+                        毎月の勉強会で利用する資料の管理や、メンバーが自由に技術的な知見を共有するナレッジベースとして活用できます。
+                    </p>
+                </div>
+            </section>
+
+            <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                <div class="bg-gray-800 p-6 rounded-xl shadow-xl flex flex-col items-center text-center">
+                    <div class="text-blue-500 text-4xl mb-4">📚</div>
+                    <h3 class="text-xl font-bold mb-2 text-gray-200">資料管理</h3>
+                    <p class="text-gray-400">
+                        勉強会資料を簡単にアップロード・共有。過去の資料もいつでも参照できます。
+                    </p>
+                    <a href="/documents" class="mt-4 text-blue-500 hover:text-blue-400 transition-colors">詳しく見る →</a>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-xl shadow-xl flex flex-col items-center text-center">
+                    <div class="text-blue-500 text-4xl mb-4">✍️</div>
+                    <h3 class="text-xl font-bold mb-2 text-gray-200">ナレッジ共有</h3>
+                    <p class="text-gray-400">
+                        各自が記事としてメモやノウハウを投稿。コメント機能で活発な議論を。
+                    </p>
+                    <a href="/knowledge" class="mt-4 text-blue-500 hover:text-blue-400 transition-colors">詳しく見る →</a>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-xl shadow-xl flex flex-col items-center text-center">
+                    <div class="text-blue-500 text-4xl mb-4">🔑</div>
+                    <h3 class="text-xl font-bold mb-2 text-gray-200">ユーザー認証</h3>
+                    <p class="text-gray-400">
+                        安全な環境でコンテンツを共有するためのユーザー認証機能を実装。
+                    </p>
+                    <a href="/login" class="mt-4 text-blue-500 hover:text-blue-400 transition-colors">ログイン →</a>
+                </div>
+            </section>
+
+            <section class="text-center bg-gray-800 p-8 rounded-xl shadow-xl">
+                <h2 class="text-3xl font-bold mb-4 text-gray-200">次回の勉強会</h2>
+                <div class="max-w-xl mx-auto">
+                    <div class="bg-gray-700 p-6 rounded-lg border border-blue-500">
+                        <p class="font-bold text-2xl text-blue-300">日時: 2025年9月15日（月） 19:00〜21:00</p>
+                        <p class="text-gray-300 mt-4">テーマ: 最新のLLM動向とファインチューニングの基礎</p>
+                        <p class="text-gray-300 mt-2">場所: オンライン（詳細は後日ナレッジ共有ページにて公開）</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
