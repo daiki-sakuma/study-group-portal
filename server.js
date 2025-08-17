@@ -3,14 +3,32 @@ const multer = require('multer');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
+const bcrypt = require('bcrypt');
+const session = require('express-session');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// セッションミドルウェアをstaticよりも先に定義
+app.use(session({
+  secret: 'your_super_secret_key',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}));
+
+// 認証ミドルウェア
+const requireAuth = (req, res, next) => {
+  if (req.session.userId) {
+    next();
+  } else {
+    res.redirect('/login');
+  }
+};
 
 // データベース設定
 const db = new sqlite3.Database('./documents.db');
@@ -44,6 +62,12 @@ db.serialize(() => {
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (article_id) REFERENCES articles (id)
   )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL
+  )`);
 });
 
 // アップロードディレクトリ作成
@@ -58,7 +82,6 @@ const storage = multer.diskStorage({
     cb(null, 'uploads/');
   },
   filename: function (req, file, cb) {
-    // セキュアなファイル名生成
     const ext = path.extname(file.originalname);
     const basename = path.basename(file.originalname, ext);
     const safeBasename = basename.replace(/[^a-zA-Z0-9-_]/g, '_');
@@ -67,13 +90,12 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ 
+const upload = multer({
   storage: storage,
   limits: {
     fileSize: 10 * 1024 * 1024 // 10MB制限
   },
   fileFilter: function (req, file, cb) {
-    // 許可するファイルタイプ
     const allowedTypes = ['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.xlsx', '.xls', '.txt'];
     const ext = path.extname(file.originalname).toLowerCase();
     if (allowedTypes.includes(ext)) {
@@ -84,33 +106,117 @@ const upload = multer({
   }
 });
 
-// ルート - アップロードフォーム
-app.get('/', (req, res) => {
+// ログイン・登録ページは認証不要なので先に定義
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
+// API - ログイン
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body;
+  
+  db.get('SELECT * FROM users WHERE username = ?', [username], async (err, user) => {
+    if (err) {
+      return res.status(500).json({ error: 'データベースエラー' });
+    }
+    
+    if (!user) {
+      return res.status(401).json({ error: 'ユーザー名またはパスワードが正しくありません' });
+    }
+    
+    const match = await bcrypt.compare(password, user.password);
+    
+    if (match) {
+      req.session.userId = user.id;
+      req.session.username = user.username;
+      res.json({ message: 'ログイン成功', username: user.username });
+    } else {
+      res.status(401).json({ error: 'ユーザー名またはパスワードが正しくありません' });
+    }
+  });
+});
+
+// API - 登録
+app.post('/api/register', (req, res) => {
+  const { username, password } = req.body;
+
+  db.get('SELECT username FROM users WHERE username = ?', [username], async (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: 'データベースエラー' });
+    }
+
+    if (row) {
+      return res.status(409).json({ error: 'このユーザー名はすでに存在します' });
+    }
+
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], function (err) {
+        if (err) {
+          return res.status(500).json({ error: 'ユーザー登録に失敗しました' });
+        }
+        res.status(201).json({ message: 'ユーザー登録が完了しました。ログインしてください。' });
+      });
+    } catch (e) {
+      res.status(500).json({ error: 'パスワードのハッシュ化に失敗しました' });
+    }
+  });
+});
+
+// API - ログアウト
+app.post('/api/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res.status(500).json({ error: 'ログアウトに失敗しました' });
+    }
+    res.json({ message: 'ログアウトしました' });
+  });
+});
+
+// 認証情報の取得API
+app.get('/api/auth_status', (req, res) => {
+  if (req.session.userId) {
+    res.json({ authenticated: true, username: req.session.username });
+  } else {
+    res.json({ authenticated: false });
+  }
+});
+
+
+// staticミドルウェアと認証が必要なルートを最後に定義
+app.use(express.static('public'));
+
+// ルート - アップロードフォーム（認証保護）
+app.get('/', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// 資料一覧ページ
-app.get('/documents', (req, res) => {
+// 資料一覧ページ（認証保護）
+app.get('/documents', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'documents.html'));
 });
 
-// ナレッジ共有ページ
-app.get('/knowledge', (req, res) => {
+// ナレッジ共有ページ（認証保護）
+app.get('/knowledge', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'knowledge.html'));
 });
 
-// 記事作成ページ
-app.get('/knowledge/new', (req, res) => {
+// 記事作成ページ（認証保護）
+app.get('/knowledge/new', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'new-article.html'));
 });
 
-// 記事詳細ページ
-app.get('/knowledge/:id', (req, res) => {
+// 記事詳細ページ（認証保護）
+app.get('/knowledge/:id', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'article.html'));
 });
 
 // API - 資料一覧取得
-app.get('/api/documents', (req, res) => {
+app.get('/api/documents', requireAuth, (req, res) => {
   db.all('SELECT * FROM documents ORDER BY upload_date DESC', (err, rows) => {
     if (err) {
       res.status(500).json({ error: 'データベースエラーが発生しました。' });
@@ -121,7 +227,7 @@ app.get('/api/documents', (req, res) => {
 });
 
 // API - 記事一覧取得
-app.get('/api/articles', (req, res) => {
+app.get('/api/articles', requireAuth, (req, res) => {
   db.all('SELECT * FROM articles ORDER BY created_at DESC', (err, rows) => {
     if (err) {
       res.status(500).json({ error: 'データベースエラーが発生しました。' });
@@ -132,7 +238,7 @@ app.get('/api/articles', (req, res) => {
 });
 
 // API - 記事詳細取得
-app.get('/api/articles/:id', (req, res) => {
+app.get('/api/articles/:id', requireAuth, (req, res) => {
   const articleId = req.params.id;
   
   db.get('SELECT * FROM articles WHERE id = ?', [articleId], (err, row) => {
@@ -151,7 +257,7 @@ app.get('/api/articles/:id', (req, res) => {
 });
 
 // API - 記事のコメント取得
-app.get('/api/articles/:id/comments', (req, res) => {
+app.get('/api/articles/:id/comments', requireAuth, (req, res) => {
   const articleId = req.params.id;
   
   db.all('SELECT * FROM comments WHERE article_id = ? ORDER BY created_at ASC', [articleId], (err, rows) => {
@@ -163,10 +269,11 @@ app.get('/api/articles/:id/comments', (req, res) => {
   });
 });
 
-// API - 記事作成
-app.post('/api/articles', (req, res) => {
-  const { title, content, author } = req.body;
-  
+// API - 記事作成（認証保護）
+app.post('/api/articles', requireAuth, (req, res) => {
+  const { title, content } = req.body;
+  const author = req.session.username; // セッションから作成者を取得
+
   if (!title || !content || !author) {
     return res.status(400).json({ error: 'タイトル、内容、作成者は必須です。' });
   }
@@ -189,10 +296,11 @@ app.post('/api/articles', (req, res) => {
   });
 });
 
-// API - コメント作成
-app.post('/api/articles/:id/comments', (req, res) => {
+// API - コメント作成（認証保護）
+app.post('/api/articles/:id/comments', requireAuth, (req, res) => {
   const articleId = req.params.id;
-  const { content, author } = req.body;
+  const { content } = req.body;
+  const author = req.session.username; // セッションから作成者を取得
   
   if (!content || !author) {
     return res.status(400).json({ error: 'コメント内容と作成者は必須です。' });
@@ -216,13 +324,14 @@ app.post('/api/articles/:id/comments', (req, res) => {
   });
 });
 
-// API - ファイルアップロード
-app.post('/api/upload', upload.single('file'), (req, res) => {
+// API - ファイルアップロード（認証保護）
+app.post('/api/upload', requireAuth, upload.single('file'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'ファイルが選択されていません。' });
   }
 
-  const { title, author } = req.body;
+  const { title } = req.body;
+  const author = req.session.username; // セッションから作成者を取得
 
   if (!title || !author) {
     return res.status(400).json({ error: 'タイトルと作成者は必須です。' });
@@ -246,8 +355,8 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
   });
 });
 
-// API - ファイルダウンロード
-app.get('/api/download/:id', (req, res) => {
+// API - ファイルダウンロード（認証保護）
+app.get('/api/download/:id', requireAuth, (req, res) => {
   const documentId = req.params.id;
 
   db.get('SELECT * FROM documents WHERE id = ?', [documentId], (err, row) => {
@@ -272,8 +381,8 @@ app.get('/api/download/:id', (req, res) => {
   });
 });
 
-// API - 文書削除
-app.delete('/api/documents/:id', (req, res) => {
+// API - 文書削除（認証保護）
+app.delete('/api/documents/:id', requireAuth, (req, res) => {
   const documentId = req.params.id;
 
   db.get('SELECT * FROM documents WHERE id = ?', [documentId], (err, row) => {
@@ -287,12 +396,10 @@ app.delete('/api/documents/:id', (req, res) => {
       return;
     }
 
-    // ファイル削除
     if (fs.existsSync(row.file_path)) {
       fs.unlinkSync(row.file_path);
     }
 
-    // データベースから削除
     db.run('DELETE FROM documents WHERE id = ?', [documentId], (err) => {
       if (err) {
         res.status(500).json({ error: 'データベースからの削除に失敗しました。' });

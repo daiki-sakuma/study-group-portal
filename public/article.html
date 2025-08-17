@@ -18,6 +18,23 @@
             padding: 20px;
         }
 
+        /* 見出しとリストの間のマージンを調整 */
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 1.5em; /* 上部のマージンを調整 */
+            margin-bottom: 0.5em; /* 下部のマージンを調整 */
+        }
+
+        /* 箇条書きリストのスタイルを調整 */
+        ul, ol {
+            margin-bottom: 1em; /* リストの下部マージンを調整 */
+            padding-left: 2em;  /* 左のインデントを調整 */
+        }
+
+        /* リストアイテムのスタイルを調整 */
+        li {
+            margin-bottom: 0.5em;
+        }
+
         .container {
             max-width: 900px;
             margin: 0 auto;
@@ -305,6 +322,54 @@
     </style>
 </head>
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@2/dist/purify.min.js"></script>
+    <script>
+        // ナビゲーションバーの動的な変更
+        document.addEventListener('DOMContentLoaded', async () => {
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks) {
+                try {
+                    const response = await fetch('/api/auth_status');
+                    const authStatus = await response.json();
+
+                    if (authStatus.authenticated) {
+                        // ログイン済みの場合
+                        navLinks.innerHTML = `
+                            <a href="/">資料アップロード</a>
+                            <a href="/documents">資料一覧</a>
+                            <a href="/knowledge">ナレッジ共有</a>
+                            <div style="flex-grow: 1;"></div>
+                            <div style="color: white; padding: 10px 0; font-weight: 500;">
+                                ${authStatus.username}としてログイン中
+                            </div>
+                            <a href="#" onclick="logout()" style="background: #e74c3c; margin-left: 10px;">ログアウト</a>
+                        `;
+                    } else {
+                        // 未ログインの場合
+                        navLinks.innerHTML = `
+                            <div style="flex-grow: 1;"></div>
+                            <a href="/login">ログイン</a>
+                            <a href="/register" style="background: #27ae60;">新規登録</a>
+                        `;
+                    }
+                } catch (error) {
+                    console.error('認証状態の取得に失敗しました:', error);
+                }
+            }
+        });
+
+        async function logout() {
+            if (confirm('ログアウトしますか？')) {
+                try {
+                    await fetch('/api/logout', { method: 'POST' });
+                    window.location.href = '/login';
+                } catch (error) {
+                    alert('ログアウトに失敗しました');
+                }
+            }
+        }
+    </script>
     <div class="container">
         <div class="header">
             <h1>記事詳細</h1>
@@ -342,11 +407,6 @@
 
                     <div class="comment-form">
                         <form id="commentForm">
-                            <div class="form-group">
-                                <label for="commentAuthor">お名前 *</label>
-                                <input type="text" id="commentAuthor" name="author" required placeholder="例：田中太郎">
-                            </div>
-
                             <div class="form-group">
                                 <label for="commentContent">コメント *</label>
                                 <textarea id="commentContent" name="content" required placeholder="この記事についてのコメントや質問をお書きください..."></textarea>
@@ -406,7 +466,11 @@
                 document.getElementById('articleTitle').textContent = article.title;
                 document.getElementById('articleAuthor').textContent = `by ${article.author}`;
                 document.getElementById('articleDate').textContent = formatDate(article.created_at);
-                document.getElementById('articleContent').textContent = article.content;
+                
+                // MarkdownをHTMLに変換し、XSS対策を施して表示
+                const markdownContent = marked.parse(article.content);
+                const sanitizedHtml = DOMPurify.sanitize(markdownContent);
+                document.getElementById('articleContent').innerHTML = sanitizedHtml;
                 
                 // ページタイトルを更新
                 document.title = `${article.title} - 会議資料管理システム`;
@@ -470,8 +534,7 @@
             
             const formData = new FormData(e.target);
             const commentData = {
-                content: formData.get('content'),
-                author: formData.get('author')
+                content: formData.get('content')
             };
             
             const submitBtn = document.getElementById('submitBtn');
