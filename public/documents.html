@@ -248,6 +248,52 @@
     </style>
 </head>
 <body>
+    <script>
+        // ナビゲーションバーの動的な変更
+        document.addEventListener('DOMContentLoaded', async () => {
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks) {
+                try {
+                    const response = await fetch('/api/auth_status');
+                    const authStatus = await response.json();
+
+                    if (authStatus.authenticated) {
+                        // ログイン済みの場合
+                        navLinks.innerHTML = `
+                            <a href="/">資料アップロード</a>
+                            <a href="/documents">資料一覧</a>
+                            <a href="/knowledge">ナレッジ共有</a>
+                            <div style="flex-grow: 1;"></div>
+                            <div style="color: white; padding: 10px 0; font-weight: 500;">
+                                ${authStatus.username}としてログイン中
+                            </div>
+                            <a href="#" onclick="logout()" style="background: #e74c3c; margin-left: 10px;">ログアウト</a>
+                        `;
+                    } else {
+                        // 未ログインの場合
+                        navLinks.innerHTML = `
+                            <div style="flex-grow: 1;"></div>
+                            <a href="/login">ログイン</a>
+                            <a href="/register" style="background: #27ae60;">新規登録</a>
+                        `;
+                    }
+                } catch (error) {
+                    console.error('認証状態の取得に失敗しました:', error);
+                }
+            }
+        });
+
+        async function logout() {
+            if (confirm('ログアウトしますか？')) {
+                try {
+                    await fetch('/api/logout', { method: 'POST' });
+                    window.location.href = '/login';
+                } catch (error) {
+                    alert('ログアウトに失敗しました');
+                }
+            }
+        }
+    </script>
     <div class="container">
         <div class="header">
             <h1>資料一覧</h1>
