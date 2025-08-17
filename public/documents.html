@@ -4,250 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>資料一覧 - 会議資料管理システム</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-            font-weight: 300;
-        }
-
-        .nav-links {
-            padding: 20px 30px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .nav-links a {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #3498db;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            margin-right: 10px;
-        }
-
-        .nav-links a:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-        }
-
-        .content {
-            padding: 40px;
-        }
-
-        .search-box {
-            margin-bottom: 30px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e1e8ed;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-        }
-
-        .documents-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .documents-table th {
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-            color: white;
-            padding: 15px;
-            text-align: left;
-            font-weight: 500;
-        }
-
-        .documents-table td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .documents-table tbody tr {
-            transition: all 0.3s ease;
-        }
-
-        .documents-table tbody tr:hover {
-            background: #f8f9fa;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .document-title {
-            font-weight: 600;
-            color: #2c3e50;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .document-title:hover {
-            color: #3498db;
-        }
-
-        .document-author {
-            color: #7f8c8d;
-            font-size: 0.9rem;
-        }
-
-        .document-date {
-            color: #95a5a6;
-            font-size: 0.9rem;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-download {
-            background: #2ecc71;
-            color: white;
-        }
-
-        .btn-download:hover {
-            background: #27ae60;
-            transform: translateY(-1px);
-        }
-
-        .btn-delete {
-            background: #e74c3c;
-            color: white;
-        }
-
-        .btn-delete:hover {
-            background: #c0392b;
-            transform: translateY(-1px);
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #7f8c8d;
-        }
-
-        .loading-spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .no-documents {
-            text-align: center;
-            padding: 40px;
-            color: #7f8c8d;
-            font-size: 1.1rem;
-        }
-
-        .message {
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .document-count {
-            margin-bottom: 20px;
-            color: #7f8c8d;
-            font-size: 0.9rem;
-        }
-
-        @media (max-width: 768px) {
-            .documents-table {
-                font-size: 0.9rem;
-            }
-            
-            .documents-table th,
-            .documents-table td {
-                padding: 10px 8px;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            .btn {
-                padding: 6px 10px;
-                font-size: 0.8rem;
-            }
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-gradient-to-br from-indigo-500 to-purple-500 min-h-screen p-4 sm:p-6 lg:p-8 font-sans">
     <script>
         // ナビゲーションバーの動的な変更
         document.addEventListener('DOMContentLoaded', async () => {
@@ -258,23 +17,21 @@
                     const authStatus = await response.json();
 
                     if (authStatus.authenticated) {
-                        // ログイン済みの場合
                         navLinks.innerHTML = `
-                            <a href="/">資料アップロード</a>
-                            <a href="/documents">資料一覧</a>
-                            <a href="/knowledge">ナレッジ共有</a>
-                            <div style="flex-grow: 1;"></div>
-                            <div style="color: white; padding: 10px 0; font-weight: 500;">
+                            <a href="/" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">資料アップロード</a>
+                            <a href="/documents" class="py-2 px-4 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-colors duration-200">資料一覧</a>
+                            <a href="/knowledge" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">ナレッジ共有</a>
+                            <div class="flex-grow"></div>
+                            <div class="text-white font-semibold flex items-center px-4">
                                 ${authStatus.username}としてログイン中
                             </div>
-                            <a href="#" onclick="logout()" style="background: #e74c3c; margin-left: 10px;">ログアウト</a>
+                            <a href="#" onclick="logout()" class="py-2 px-4 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold transition-colors duration-200">ログアウト</a>
                         `;
                     } else {
-                        // 未ログインの場合
                         navLinks.innerHTML = `
-                            <div style="flex-grow: 1;"></div>
-                            <a href="/login">ログイン</a>
-                            <a href="/register" style="background: #27ae60;">新規登録</a>
+                            <div class="flex-grow"></div>
+                            <a href="/login" class="py-2 px-4 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-colors duration-200">ログイン</a>
+                            <a href="/register" class="py-2 px-4 rounded-lg bg-green-500 hover:bg-green-600 text-white font-semibold transition-colors duration-200">新規登録</a>
                         `;
                     }
                 } catch (error) {
@@ -294,62 +51,53 @@
             }
         }
     </script>
-    <div class="container">
-        <div class="header">
-            <h1>資料一覧</h1>
-        </div>
+    <div class="container max-w-6xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+        <header class="bg-gray-800 text-white p-6 sm:p-8 text-center">
+            <h1 class="text-3xl sm:text-4xl font-light mb-2">資料一覧</h1>
+            <p class="text-gray-300 text-lg">アップロードされたすべての会議資料</p>
+        </header>
 
-        <div class="nav-links">
-            <a href="/">新しい資料をアップロード</a>
-            <a href="/knowledge">ナレッジ共有</a>
-            <a href="#" onclick="loadDocuments()">更新</a>
-        </div>
+        <nav class="nav-links flex flex-wrap items-center gap-2 p-4 border-b border-gray-200 bg-gray-800 text-white sm:text-base text-sm"></nav>
 
-        <div class="content">
-            <div class="message" id="message"></div>
+        <main class="p-6 sm:p-8">
+            <div id="message" class="hidden p-4 rounded-lg mb-4"></div>
 
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="タイトルまたは作成者で検索...">
+            <div class="search-box mb-6">
+                <input type="text" id="searchInput" placeholder="タイトルまたは作成者で検索..." class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow duration-200">
             </div>
 
-            <div class="document-count" id="documentCount"></div>
-
-            <div id="loading" class="loading">
-                <div class="loading-spinner"></div>
+            <div id="loading" class="text-center p-8 text-gray-600">
+                <div class="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mx-auto mb-2"></div>
                 <div>読み込み中...</div>
             </div>
 
-            <div id="documentsContainer">
-                <table class="documents-table" id="documentsTable" style="display: none;">
-                    <thead>
+            <div id="documentsContainer" class="overflow-x-auto">
+                <table id="documentsTable" class="min-w-full bg-white rounded-xl shadow-md hidden">
+                    <thead class="bg-gray-100">
                         <tr>
-                            <th>タイトル</th>
-                            <th>作成者</th>
-                            <th>アップロード日</th>
-                            <th>アクション</th>
+                            <th class="py-4 px-6 text-left text-sm font-semibold text-gray-700">タイトル</th>
+                            <th class="py-4 px-6 text-left text-sm font-semibold text-gray-700">作成者</th>
+                            <th class="py-4 px-6 text-left text-sm font-semibold text-gray-700">アップロード日</th>
+                            <th class="py-4 px-6 text-left text-sm font-semibold text-gray-700">アクション</th>
                         </tr>
                     </thead>
-                    <tbody id="documentsTableBody">
+                    <tbody id="documentsTableBody" class="divide-y divide-gray-200">
                     </tbody>
                 </table>
-
-                <div class="no-documents" id="noDocuments" style="display: none;">
+                <div id="noDocuments" class="text-center p-8 text-gray-500 hidden">
                     <p>まだ資料がアップロードされていません。</p>
-                    <p><a href="/" style="color: #3498db;">最初の資料をアップロード</a>してみましょう。</p>
+                    <a href="/" class="text-blue-600 hover:underline mt-2 inline-block">最初の資料をアップロードしてみましょう。</a>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <script>
         let allDocuments = [];
         let filteredDocuments = [];
 
-        // ページ読み込み時に資料一覧を取得
         document.addEventListener('DOMContentLoaded', () => {
             loadDocuments();
-            
-            // 検索機能
             const searchInput = document.getElementById('searchInput');
             searchInput.addEventListener('input', filterDocuments);
         });
@@ -359,9 +107,9 @@
             const documentsTable = document.getElementById('documentsTable');
             const noDocuments = document.getElementById('noDocuments');
             
-            loading.style.display = 'block';
-            documentsTable.style.display = 'none';
-            noDocuments.style.display = 'none';
+            loading.classList.remove('hidden');
+            documentsTable.classList.add('hidden');
+            noDocuments.classList.add('hidden');
             
             try {
                 const response = await fetch('/api/documents');
@@ -371,10 +119,10 @@
                 filteredDocuments = documents;
                 
                 if (documents.length === 0) {
-                    noDocuments.style.display = 'block';
+                    noDocuments.classList.remove('hidden');
                 } else {
                     displayDocuments(documents);
-                    documentsTable.style.display = 'table';
+                    documentsTable.classList.remove('hidden');
                 }
                 
                 updateDocumentCount(documents.length);
@@ -382,7 +130,7 @@
                 showMessage('資料の読み込みに失敗しました', 'error');
             }
             
-            loading.style.display = 'none';
+            loading.classList.add('hidden');
         }
 
         function displayDocuments(documents) {
@@ -391,24 +139,25 @@
             
             documents.forEach(doc => {
                 const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 transition-colors duration-150';
                 row.innerHTML = `
-                    <td>
-                        <div class="document-title" onclick="downloadDocument(${doc.id})">
+                    <td class="py-4 px-6 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900 cursor-pointer hover:text-blue-600 transition-colors duration-200" onclick="downloadDocument(${doc.id})">
                             ${escapeHtml(doc.title)}
                         </div>
                     </td>
-                    <td>
-                        <div class="document-author">${escapeHtml(doc.author)}</div>
+                    <td class="py-4 px-6 whitespace-nowrap">
+                        <div class="text-sm text-gray-500">${escapeHtml(doc.author)}</div>
                     </td>
-                    <td>
-                        <div class="document-date">${formatDate(doc.upload_date)}</div>
+                    <td class="py-4 px-6 whitespace-nowrap">
+                        <div class="text-sm text-gray-500">${formatDate(doc.upload_date)}</div>
                     </td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn btn-download" onclick="downloadDocument(${doc.id})">
+                    <td class="py-4 px-6 whitespace-nowrap text-right text-sm font-medium">
+                        <div class="flex items-center space-x-2">
+                            <button class="text-blue-600 hover:text-blue-900 transition-colors duration-200" onclick="downloadDocument(${doc.id})">
                                 ダウンロード
                             </button>
-                            <button class="btn btn-delete" onclick="deleteDocument(${doc.id})">
+                            <button class="text-red-600 hover:text-red-900 transition-colors duration-200" onclick="deleteDocument(${doc.id})">
                                 削除
                             </button>
                         </div>
@@ -465,7 +214,7 @@
                 
                 if (response.ok) {
                     showMessage(result.message, 'success');
-                    loadDocuments(); // 一覧を再読み込み
+                    loadDocuments();
                 } else {
                     showMessage(result.error || '削除に失敗しました', 'error');
                 }
@@ -494,11 +243,15 @@
         function showMessage(text, type) {
             const message = document.getElementById('message');
             message.textContent = text;
-            message.className = `message ${type}`;
-            message.style.display = 'block';
+            if (type === 'success') {
+                message.className = 'bg-green-100 text-green-700 p-4 rounded-lg mb-4';
+            } else if (type === 'error') {
+                message.className = 'bg-red-100 text-red-700 p-4 rounded-lg mb-4';
+            }
+            message.classList.remove('hidden');
             
             setTimeout(() => {
-                message.style.display = 'none';
+                message.classList.add('hidden');
             }, 5000);
         }
     </script>

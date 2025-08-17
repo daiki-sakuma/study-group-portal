@@ -4,324 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>記事詳細 - 会議資料管理システム</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* Markdownのスタイル調整 */
+        .markdown-content h1, .markdown-content h2, .markdown-content h3 {
+            font-weight: bold;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        /* 見出しとリストの間のマージンを調整 */
-        h1, h2, h3, h4, h5, h6 {
-            margin-top: 1.5em; /* 上部のマージンを調整 */
-            margin-bottom: 0.5em; /* 下部のマージンを調整 */
-        }
-
-        /* 箇条書きリストのスタイルを調整 */
-        ul, ol {
-            margin-bottom: 1em; /* リストの下部マージンを調整 */
-            padding-left: 2em;  /* 左のインデントを調整 */
-        }
-
-        /* リストアイテムのスタイルを調整 */
-        li {
-            margin-bottom: 0.5em;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-            font-weight: 300;
-        }
-
-        .nav-links {
-            padding: 20px 30px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .nav-links a {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #3498db;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            margin-right: 10px;
-        }
-
-        .nav-links a:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-        }
-
-        .content {
-            padding: 40px;
-        }
-
-        .article-header {
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #ecf0f1;
-        }
-
-        .article-title {
-            font-size: 2rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 15px;
-            line-height: 1.3;
-        }
-
-        .article-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #7f8c8d;
-            font-size: 0.95rem;
-        }
-
-        .article-author {
-            font-weight: 500;
-            color: #3498db;
-        }
-
-        .article-date {
-            font-style: italic;
-        }
-
-        .article-content {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: #2c3e50;
-            margin-bottom: 40px;
-            white-space: pre-wrap;
-        }
-
-        .comments-section {
-            border-top: 2px solid #ecf0f1;
-            padding-top: 30px;
-        }
-
-        .comments-header {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .comment-form {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 25px;
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #2c3e50;
-        }
-
-        .form-group input[type="text"] {
-            width: 100%;
-            padding: 10px 12px;
-            border: 2px solid #e1e8ed;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e8ed;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            font-family: inherit;
-            resize: vertical;
-            min-height: 100px;
-            line-height: 1.5;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input[type="text"]:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-        }
-
-        .submit-btn {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
-        }
-
-        .submit-btn:disabled {
-            background: #bdc3c7;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .comments-list {
-            space-y: 20px;
-        }
-
-        .comment {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .comment:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .comment-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .comment-author {
-            font-weight: 500;
-            color: #3498db;
-        }
-
-        .comment-date {
-            font-size: 0.85rem;
-            color: #95a5a6;
-            font-style: italic;
-        }
-
-        .comment-content {
-            color: #2c3e50;
-            line-height: 1.6;
-            white-space: pre-wrap;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #7f8c8d;
-        }
-
-        .loading-spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .message {
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .no-comments {
-            text-align: center;
-            padding: 30px;
-            color: #7f8c8d;
-            font-style: italic;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                margin: 10px;
-            }
-            
-            .content {
-                padding: 20px;
-            }
-            
-            .article-title {
-                font-size: 1.6rem;
-            }
-            
-            .article-meta {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-            
-            .comment-form {
-                padding: 20px;
-            }
-        }
+        .markdown-content h1 { font-size: 2.25rem; }
+        .markdown-content h2 { font-size: 1.5rem; }
+        .markdown-content h3 { font-size: 1.25rem; }
+        .markdown-content p { margin-top: 0.5rem; margin-bottom: 0.5rem; line-height: 1.625; }
+        /* 黒丸の箇条書き */
+        .markdown-content ul { list-style-type: disc; list-style-position: inside; margin-left: 1rem; margin-top: 0.5rem; margin-bottom: 0.5rem; }
+        /* 数字の箇条書き */
+        .markdown-content ol { list-style-type: decimal; list-style-position: inside; margin-left: 1rem; margin-top: 0.5rem; margin-bottom: 0.5rem; }
+        .markdown-content pre { background-color: #1a202c; color: white; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem; margin-bottom: 1rem; overflow-x: auto; }
+        .markdown-content code { background-color: #e2e8f0; color: #2d3748; padding: 0.25rem; border-radius: 0.25rem; }
+        .markdown-content pre code { background-color: transparent; color: white; padding: 0; }
     </style>
 </head>
-<body>
+<body class="bg-gradient-to-br from-indigo-500 to-purple-500 min-h-screen p-4 sm:p-6 lg:p-8 font-sans">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@2/dist/purify.min.js"></script>
     <script>
@@ -336,21 +40,22 @@
                     if (authStatus.authenticated) {
                         // ログイン済みの場合
                         navLinks.innerHTML = `
-                            <a href="/">資料アップロード</a>
-                            <a href="/documents">資料一覧</a>
-                            <a href="/knowledge">ナレッジ共有</a>
-                            <div style="flex-grow: 1;"></div>
-                            <div style="color: white; padding: 10px 0; font-weight: 500;">
+                            <a href="/" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">資料アップロード</a>
+                            <a href="/documents" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">資料一覧</a>
+                            <a href="/knowledge" class="py-2 px-4 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-colors duration-200">ナレッジ共有</a>
+                            <div class="flex-grow"></div>
+                            <a href="/knowledge/new" class="py-2 px-4 rounded-lg bg-green-500 hover:bg-green-600 text-white font-semibold transition-colors duration-200">新しい記事を作成</a>
+                            <div class="text-white font-semibold flex items-center px-4">
                                 ${authStatus.username}としてログイン中
                             </div>
-                            <a href="#" onclick="logout()" style="background: #e74c3c; margin-left: 10px;">ログアウト</a>
+                            <a href="#" onclick="logout()" class="py-2 px-4 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold transition-colors duration-200">ログアウト</a>
                         `;
                     } else {
                         // 未ログインの場合
                         navLinks.innerHTML = `
-                            <div style="flex-grow: 1;"></div>
-                            <a href="/login">ログイン</a>
-                            <a href="/register" style="background: #27ae60;">新規登録</a>
+                            <div class="flex-grow"></div>
+                            <a href="/login" class="py-2 px-4 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-colors duration-200">ログイン</a>
+                            <a href="/register" class="py-2 px-4 rounded-lg bg-green-500 hover:bg-green-600 text-white font-semibold transition-colors duration-200">新規登録</a>
                         `;
                     }
                 } catch (error) {
@@ -370,62 +75,58 @@
             }
         }
     </script>
-    <div class="container">
-        <div class="header">
-            <h1>記事詳細</h1>
-        </div>
+    <div class="container max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+        <header class="bg-gray-800 text-white p-6 sm:p-8 text-center">
+            <h1 class="text-3xl sm:text-4xl font-light mb-2">記事詳細</h1>
+            <p class="text-gray-300 text-lg">ナレッジとディスカッション</p>
+        </header>
 
-        <div class="nav-links">
-            <a href="/knowledge">記事一覧に戻る</a>
-            <a href="/">資料アップロード</a>
-            <a href="/documents">資料一覧</a>
-        </div>
+        <nav class="nav-links flex flex-wrap items-center gap-2 p-4 border-b border-gray-200 bg-gray-800 text-white sm:text-base text-sm"></nav>
 
-        <div class="content">
-            <div class="message" id="message"></div>
+        <main class="p-6 sm:p-8">
+            <div id="message" class="hidden p-4 rounded-lg mb-4"></div>
 
-            <div id="loading" class="loading">
-                <div class="loading-spinner"></div>
+            <div id="loading" class="text-center p-8 text-gray-600">
+                <div class="w-8 h-8 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin mx-auto mb-2"></div>
                 <div>読み込み中...</div>
             </div>
 
-            <div id="articleContainer" style="display: none;">
-                <div class="article-header">
-                    <h1 class="article-title" id="articleTitle"></h1>
-                    <div class="article-meta">
-                        <div class="article-author" id="articleAuthor"></div>
-                        <div class="article-date" id="articleDate"></div>
+            <article id="articleContainer" class="hidden">
+                <header class="mb-8 pb-6 border-b-2 border-gray-200">
+                    <h1 id="articleTitle" class="text-4xl font-bold text-gray-900 mb-4 leading-tight"></h1>
+                    <div class="flex items-center justify-between text-gray-500 text-sm">
+                        <span id="articleAuthor" class="font-medium text-blue-600"></span>
+                        <span id="articleDate" class="italic"></span>
                     </div>
-                </div>
+                </header>
 
-                <div class="article-content" id="articleContent"></div>
+                <div id="articleContent" class="markdown-content text-gray-800 text-lg leading-relaxed mb-10"></div>
 
-                <div class="comments-section">
-                    <div class="comments-header">
-                        💬 コメント <span id="commentCount">(0)</span>
-                    </div>
+                <section class="comments-section border-t-2 border-gray-200 pt-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center space-x-2">
+                        💬 コメント <span id="commentCount" class="text-xl text-gray-500">(0)</span>
+                    </h2>
 
-                    <div class="comment-form">
+                    <div class="comment-form bg-gray-50 rounded-xl p-6 shadow-inner mb-8">
                         <form id="commentForm">
-                            <div class="form-group">
-                                <label for="commentContent">コメント *</label>
-                                <textarea id="commentContent" name="content" required placeholder="この記事についてのコメントや質問をお書きください..."></textarea>
+                            <div class="mb-4">
+                                <label for="commentContent" class="block text-gray-700 font-bold mb-2">コメント</label>
+                                <textarea id="commentContent" name="content" required placeholder="この記事についてのコメントや質問をお書きください..." class="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow duration-200 font-sans text-base resize-y"></textarea>
                             </div>
-
-                            <button type="submit" class="submit-btn" id="submitBtn">
+                            <button type="submit" id="submitBtn" class="w-full sm:w-auto py-3 px-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-300 focus:outline-none">
                                 コメントを投稿
                             </button>
                         </form>
                     </div>
 
-                    <div class="comments-list" id="commentsList">
-                        <div class="no-comments" id="noComments">
+                    <div id="commentsList" class="space-y-4">
+                        <div id="noComments" class="text-center p-8 text-gray-500 hidden italic">
                             まだコメントがありません。最初のコメントを投稿してみましょう。
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
+                </section>
+            </article>
+        </main>
     </div>
 
     <script>
@@ -451,8 +152,8 @@
             const loading = document.getElementById('loading');
             const articleContainer = document.getElementById('articleContainer');
             
-            loading.style.display = 'block';
-            articleContainer.style.display = 'none';
+            loading.classList.remove('hidden');
+            articleContainer.classList.add('hidden');
             
             try {
                 const response = await fetch(`/api/articles/${articleId}`);
@@ -475,12 +176,12 @@
                 // ページタイトルを更新
                 document.title = `${article.title} - 会議資料管理システム`;
                 
-                articleContainer.style.display = 'block';
+                articleContainer.classList.remove('hidden');
             } catch (error) {
                 showMessage('記事の読み込みに失敗しました', 'error');
             }
             
-            loading.style.display = 'none';
+            loading.classList.add('hidden');
         }
 
         async function loadComments() {
@@ -500,24 +201,24 @@
             const noComments = document.getElementById('noComments');
             
             if (comments.length === 0) {
-                noComments.style.display = 'block';
+                noComments.classList.remove('hidden');
                 return;
             }
             
-            noComments.style.display = 'none';
+            noComments.classList.add('hidden');
             
             commentsList.innerHTML = '';
             
             comments.forEach(comment => {
                 const commentDiv = document.createElement('div');
-                commentDiv.className = 'comment';
+                commentDiv.className = 'bg-gray-100 rounded-lg p-4 shadow-sm';
                 
                 commentDiv.innerHTML = `
-                    <div class="comment-header">
-                        <div class="comment-author">${escapeHtml(comment.author)}</div>
-                        <div class="comment-date">${formatDate(comment.created_at)}</div>
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="font-semibold text-gray-800">${escapeHtml(comment.author)}</div>
+                        <div class="text-xs text-gray-500">${formatDate(comment.created_at)}</div>
                     </div>
-                    <div class="comment-content">${escapeHtml(comment.content)}</div>
+                    <p class="text-gray-700 leading-relaxed">${escapeHtml(comment.content)}</p>
                 `;
                 
                 commentsList.appendChild(commentDiv);
@@ -587,11 +288,15 @@
         function showMessage(text, type) {
             const message = document.getElementById('message');
             message.textContent = text;
-            message.className = `message ${type}`;
-            message.style.display = 'block';
+            if (type === 'success') {
+                message.className = 'bg-green-100 text-green-700 p-4 rounded-lg mb-4';
+            } else if (type === 'error') {
+                message.className = 'bg-red-100 text-red-700 p-4 rounded-lg mb-4';
+            }
+            message.classList.remove('hidden');
             
             setTimeout(() => {
-                message.style.display = 'none';
+                message.classList.add('hidden');
             }, 5000);
         }
     </script>
