@@ -190,9 +190,9 @@ app.get('/api/auth_status', (req, res) => {
 // staticミドルウェアと認証が必要なルートを最後に定義
 app.use(express.static('public'));
 
-// ルート - アップロードフォーム（認証保護）
-app.get('/', requireAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// ルート - 新しいトップページ（認証保護）
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'top.html'));
 });
 
 // 資料一覧ページ（認証保護）
@@ -213,6 +213,11 @@ app.get('/knowledge/new', requireAuth, (req, res) => {
 // 記事詳細ページ（認証保護）
 app.get('/knowledge/:id', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'article.html'));
+});
+
+// 新しい資料アップロードページ（認証保護）
+app.get('/upload', requireAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'upload.html'));
 });
 
 // API - 資料一覧取得

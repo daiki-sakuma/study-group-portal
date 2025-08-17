@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポータルサイト - 会議資料管理システム</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-indigo-500 to-purple-500 min-h-screen p-4 sm:p-6 lg:p-8 font-sans">
+    <script>
+        // ナビゲーションバーの動的な変更
+        document.addEventListener('DOMContentLoaded', async () => {
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks) {
+                try {
+                    const response = await fetch('/api/auth_status');
+                    const authStatus = await response.json();
+
+                    if (authStatus.authenticated) {
+                        // ログイン済みの場合
+                        navLinks.innerHTML = `
+                            <a href="/" class="py-2 px-4 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-colors duration-200">ホーム</a>
+                            <a href="/upload" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">資料アップロード</a>
+                            <a href="/documents" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">資料一覧</a>
+                            <a href="/knowledge" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">ナレッジ共有</a>
+                            <div class="flex-grow"></div>
+                            <div class="text-white font-semibold flex items-center px-4">
+                                ${authStatus.username}としてログイン中
+                            </div>
+                            <a href="#" onclick="logout()" class="py-2 px-4 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold transition-colors duration-200">ログアウト</a>
+                        `;
+                    } else {
+                        // 未ログインの場合
+                        navLinks.innerHTML = `
+                            <a href="/" class="py-2 px-4 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-colors duration-200">ホーム</a>
+                            <a href="/upload" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">資料アップロード</a>
+                            <a href="/documents" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">資料一覧</a>
+                            <a href="/knowledge" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">ナレッジ共有</a>
+                            <div class="flex-grow"></div>
+                            <a href="/login" class="py-2 px-4 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-colors duration-200">ログイン</a>
+                            <a href="/register" class="py-2 px-4 rounded-lg bg-green-500 hover:bg-green-600 text-white font-semibold transition-colors duration-200">新規登録</a>
+                        `;
+                    }
+                } catch (error) {
+                    console.error('認証状態の取得に失敗しました:', error);
+                }
+            }
+        });
+
+        async function logout() {
+            if (confirm('ログアウトしますか？')) {
+                try {
+                    await fetch('/api/logout', { method: 'POST' });
+                    window.location.href = '/login';
+                } catch (error) {
+                    alert('ログアウトに失敗しました');
+                }
+            }
+        }
+    </script>
+    <div class="container max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+        <header class="bg-gray-800 text-white p-6 sm:p-8 text-center">
+            <h1 class="text-3xl sm:text-4xl font-light mb-2">勉強会ポータルサイトへようこそ！</h1>
+            <p class="text-gray-300 text-lg">AI・機械学習を学ぶコミュニティ</p>
+        </header>
+
+        <nav class="nav-links flex flex-wrap items-center gap-2 p-4 border-b border-gray-200 bg-gray-800 text-white sm:text-base text-sm"></nav>
+
+        <main class="p-6 sm:p-8">
+            <div id="message" class="hidden p-4 rounded-lg mb-4"></div>
+
+            <div class="prose max-w-none text-gray-800 leading-relaxed">
+                <h2 class="text-2xl font-semibold mb-4">このポータルサイトについて</h2>
+                <p class="mb-4">
+                    このサイトは、AI技術や機械学習に関する知識を共有し、メンバー同士が交流を深めるためのプラットフォームです。
+                    毎月の勉強会で利用する資料の管理や、メンバーが自由に技術的な知見を共有するナレッジベースとして活用できます。
+                </p>
+                
+                <h3 class="text-xl font-semibold mt-6 mb-2">主な機能</h3>
+                <ul class="list-disc list-inside space-y-2">
+                    <li>**資料アップロード**: 毎月の勉強会で使用する資料をアップロード、管理、ダウンロードできます。</li>
+                    <li>**ナレッジ共有**: メンバーが自由に記事を投稿し、知見を共有できます。記事にはMarkdown記法が使えます。</li>
+                    <li>**コメント機能**: 記事に対してコメントを投稿し、活発な議論を行うことができます。</li>
+                </ul>
+                
+                <h3 class="text-xl font-semibold mt-6 mb-2">次回の勉強会</h3>
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <p class="font-bold text-lg text-blue-800">日時: 2025年9月15日（月） 19:00〜21:00</p>
+                    <p class="text-blue-700 mt-2">テーマ: 最新のLLM動向とファインチューニングの基礎</p>
+                    <p class="text-blue-700 mt-1">場所: オンライン（詳細は後日ナレッジ共有ページにて公開）</p>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

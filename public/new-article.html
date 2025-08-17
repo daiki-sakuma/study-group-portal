@@ -18,14 +18,18 @@
                     const response = await fetch('/api/auth_status');
                     const authStatus = await response.json();
 
+                    const baseLinks = `
+                        <a href="/" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">ホーム</a>
+                        <a href="/upload" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">資料アップロード</a>
+                        <a href="/documents" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">資料一覧</a>
+                        <a href="/knowledge" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">ナレッジ共有</a>
+                    `;
+
                     if (authStatus.authenticated) {
                         // ログイン済みの場合
                         navLinks.innerHTML = `
-                            <a href="/" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">資料アップロード</a>
-                            <a href="/documents" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">資料一覧</a>
-                            <a href="/knowledge" class="py-2 px-4 rounded-lg text-white font-semibold hover:bg-gray-700 transition-colors duration-200">ナレッジ共有</a>
+                            ${baseLinks}
                             <div class="flex-grow"></div>
-                            <a href="/knowledge/new" class="py-2 px-4 rounded-lg bg-green-500 hover:bg-green-600 text-white font-semibold transition-colors duration-200">新しい記事を作成</a>
                             <div class="text-white font-semibold flex items-center px-4">
                                 ${authStatus.username}としてログイン中
                             </div>
@@ -34,11 +38,23 @@
                     } else {
                         // 未ログインの場合
                         navLinks.innerHTML = `
+                            ${baseLinks}
                             <div class="flex-grow"></div>
                             <a href="/login" class="py-2 px-4 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-colors duration-200">ログイン</a>
                             <a href="/register" class="py-2 px-4 rounded-lg bg-green-500 hover:bg-green-600 text-white font-semibold transition-colors duration-200">新規登録</a>
                         `;
                     }
+                    
+                    // 現在のページに対応するナビゲーションリンクにアクティブスタイルを適用
+                    const currentPath = window.location.pathname;
+                    navLinks.querySelectorAll('a').forEach(link => {
+                        if (link.getAttribute('href') === currentPath) {
+                            link.classList.add('bg-blue-500', 'hover:bg-blue-600');
+                        } else if (currentPath === '/' && link.getAttribute('href') === '/') {
+                            link.classList.add('bg-blue-500', 'hover:bg-blue-600');
+                        }
+                    });
+
                 } catch (error) {
                     console.error('認証状態の取得に失敗しました:', error);
                 }
